@@ -49,6 +49,7 @@ if __name__ == '__main__':
         'uPK': UPageKiteSettings,
         'kites': [],
         'socks': [],
+        'web_root': web_root,
         'settings': settings}
 
     httpd = HTTPD(
@@ -56,6 +57,7 @@ if __name__ == '__main__':
         web_root,
         {'app': global_app_env},
         UPageKiteSettings)
+    global_app_env['httpd'] = httpd
 
     kite = LocalHTTPKite(local_port,
         settings.get('kite_name'),
