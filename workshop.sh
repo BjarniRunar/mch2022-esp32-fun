@@ -24,6 +24,8 @@ cat<<tac
 #
 tac
 
+
+##############################################################################
 ### 0. Download the workshop handouts (or ask Bjarni for the backup USB key)
 #
 # git clone https://github.com/BjarniRunar/mch2022-esp32-fun
@@ -56,6 +58,7 @@ set -e -x
 ### -- Script magic ends --
 
 
+##############################################################################
 ### 1. Install Prerequisites
 #
 # See: https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/linux-macos-setup.html
@@ -81,6 +84,7 @@ set -e -x
 exit 0  # Comment out the code above, and delete this line to proceed.
 
 
+##############################################################################
 ### 2. Check if we can see the chip!
 #
 ## Plug it in to your USB port
@@ -88,7 +92,7 @@ exit 0  # Comment out the code above, and delete this line to proceed.
 # dmesg |tail -20 |grep -i usb
 #
 ## You should see a USB serial device; is it ttyUSBn ?
-## If not, we need to check cabling or try another board. 
+## If not, we need to check cabling or try another board.
 #
 ## Edit this line, if necessary:
 export ESP32TTY=/dev/ttyUSB0     # Don't comment this out, it's used later!
@@ -105,6 +109,7 @@ export ESP32TTY=/dev/ttyUSB0     # Don't comment this out, it's used later!
 exit 0  # Comment out the code above, and delete this to proceed.
 
 
+##############################################################################
 ### 3. Download some tools and binaries (or copy from the USB stick)
 #
 ## The ESP32 SDK: version 4.4, so we can rebuild MicroPython later on
@@ -129,6 +134,7 @@ exit 0  # Comment out the code above, and delete this to proceed.
 exit 0  # Comment out the code above, and delete this to proceed.
 
 
+##############################################################################
 ### 4. Flashing the chip with MicroPython
 #
 # cd $HACKDIR/firmwares
@@ -141,12 +147,12 @@ exit 0  # Comment out the code above, and delete this to proceed.
 ##       but be warned that the write_flash command must match!
 #
 # esptool.py --port $ESP32TTY --baud 460800 read_flash 0x1000 0x3ff000 \
-#   esp32-cam-stock-firmware.bin
+#   $HACKDIR/firmwares/esp32-cam-stock-firmware.bin
 #
 ## Flashing! Modify this if you have another binary you like.
 #
 # esptool.py --port $ESP32TTY --baud 460800 write_flash -z 0x1000 \
-#   esp32spiram-20220618-v1.19.1.bin
+#   $HACKDIR/firmwares/esp32spiram-20220618-v1.19.1.bin
 #
 #
 # (After this, we should fall through to a shell configured for further
@@ -155,6 +161,7 @@ exit 0  # Comment out the code above, and delete this to proceed.
 
 
 
+##############################################################################
 ### 5. Let's take a loop at the sample webapp!
 #
 # vi $HACKDIR/webapp/stage_2.py
@@ -163,7 +170,6 @@ exit 0  # Comment out the code above, and delete this to proceed.
 #
 # cd $HACKDIR/webapp
 # exec python3 stage_2.py
-
 
 ### 6. Uploading the upagekite source and demo to the chip
 #
@@ -174,11 +180,44 @@ exit 0  # Comment out the code above, and delete this to proceed.
 ## when done. For other options, consult pydoc:
 #
 # pydoc3 upagekite.esp32_install
-# 
-exec python3 -m upagekite.esp32_install \
-  |picocom --lower-dtr --lower-rts -b115200 $ESP32TTY
+#
+# python3 -m upagekite.esp32_install \
+#   |picocom --lower-dtr --lower-rts -b115200 $ESP32TTY
+# exit 0
 #
 ## Now we alternate between steps 5 and 6 to create our app!
+
+
+##### FIXME: Insert security discussion here, demo more of the upagekite
+#####        web framework.
+
+
+##############################################################################
+### 7. Let's get the camera working!
+#
+## See: https://lemariva.com/blog/2020/06/micropython-support-cameras-m5camera-esp32-cam-etc
+## Also: https://github.com/BjarniRunar/building-micropython
+#
+## Download Bjarni's firmware (or build your own)
+#
+# cd $HACKDIR/firmwares
+# wget https://github.com/BjarniRunar/micropython-firmwares/raw/main/micropython-esp32-cam-upagekite-20220720.bin
+#
+## Flash it...
+#
+# source $HACKDIR/esp-idf/export.sh >/dev/null 2>&1
+# esptool.py --port $ESP32TTY --baud 460800 write_flash -z 0x1000 \
+#   $HACKDIR/firmwares/micropython-esp32-cam-upagekite-20220720.bin
+#
+# rm -f /tmp/upk-change-marker.*  # Force esp32_install to re-up everything
+#
+## Connect to the chip, does it look different?  CTRL+X exits.
+#
+# sleep 2
+# exec picocom --lower-dtr --lower-rts -b115200 $ESP32TTY
+#
+## Now go back to steps 5/6: but add --nopk to esp32_install!
+
 
 
 ### N. Play around!
@@ -204,4 +243,4 @@ Hint: Use CTRL-X to escape out of picocom.
 tac
 exec bash \
   --rcfile <(echo "PS1='MCH/ESP32/\$? \\[\\033[1;32m\\]\\w\\[\\033[0m\\] \$ '")\
-  -i 
+  -i
