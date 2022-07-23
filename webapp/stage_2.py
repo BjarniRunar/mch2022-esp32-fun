@@ -2,6 +2,8 @@ from upagekite import uPageKite, uPageKiteDefaults, LocalHTTPKite
 from upagekite.httpd import HTTPD
 
 # from demo_routes import setup_routes
+# from demo_security import setup_security
+# from demo_websocket import setup_websocket
 # from demo_camera import setup_camera
 
 
@@ -15,7 +17,7 @@ class UPageKiteSettings(uPageKiteDefaults):
     WITH_SSL = True
 
     trace = lambda msg: None  # Silently discard trace messages
-    debug = lambda msg: None  # Silently discard debug messages
+    debug = print
     error = print
     info = print
 
@@ -71,12 +73,14 @@ if __name__ == '__main__':
     if kite.fd and local_port:
         print('=2= Listening on http://localhost:%d/' % (local_port,))
         global_app_env['socks'].append(kite)
- 
+
     upk_manager = uPageKite(global_app_env['kites'],
         socks=global_app_env['socks'],
         uPK=UPageKiteSettings)
 
     # setup_routes(global_app_env)
+    # setup_security(global_app_env)
+    # setup_websocket(global_app_env)
     # setup_camera(global_app_env)
 
     UPageKiteSettings.debug('global_app_env=%s' % global_app_env)

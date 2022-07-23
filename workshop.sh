@@ -36,8 +36,8 @@ tac
 #
 # vi workshop.sh   ## <- You Are Here
 #
-# export UPK_WIFI_SSID="MCH2022-open"
-# export UPK_WIFI_KEY=""
+export UPK_WIFI_SSID="MCH2022-open"
+export UPK_WIFI_KEY=""
 # export UPK_KITE_NAME=""
 # export UPK_KITE_SECRET=""
 #
@@ -87,16 +87,20 @@ exit 0  # Comment out the code above, and delete this line to proceed.
 ##############################################################################
 ### 2. Check if we can see the chip!
 #
-## Plug it in to your USB port
+# Windows/WSL users: see https://devblogs.microsoft.com/commandline/connecting-usb-devices-to-wsl/
 #
-# dmesg |tail -20 |grep -i usb
+## Plug it in to your USB port, does it create a device?
+#
+# dmesg |tail -20 |grep -i usb  # May need sudo!
+#
+# ls /dev/ttyUSB*  # Linux
+# ls /dev/cu.*     # MacOS
 #
 ## You should see a USB serial device; is it ttyUSBn ?
 ## If not, we need to check cabling or try another board.
 #
 ## Edit this line, if necessary:
 export ESP32TTY=/dev/ttyUSB0     # Don't comment this out, it's used later!
-
 
 
 
@@ -160,7 +164,6 @@ exit 0  # Comment out the code above, and delete this to proceed.
 
 
 
-
 ##############################################################################
 ### 5. Let's take a loop at the sample webapp!
 #
@@ -201,13 +204,13 @@ exit 0  # Comment out the code above, and delete this to proceed.
 ## Download Bjarni's firmware (or build your own)
 #
 # cd $HACKDIR/firmwares
-# wget https://github.com/BjarniRunar/micropython-firmwares/raw/main/micropython-esp32-cam-upagekite-20220720.bin
+# wget https://github.com/BjarniRunar/micropython-firmwares/raw/main/micropython-esp32-cam-upagekite-20220722.bin
 #
 ## Flash it...
 #
 # source $HACKDIR/esp-idf/export.sh >/dev/null 2>&1
 # esptool.py --port $ESP32TTY --baud 460800 write_flash -z 0x1000 \
-#   $HACKDIR/firmwares/micropython-esp32-cam-upagekite-20220720.bin
+#   $HACKDIR/firmwares/micropython-esp32-cam-upagekite-20220722.bin
 #
 # rm -f /tmp/upk-change-marker.*  # Force esp32_install to re-up everything
 #
@@ -217,6 +220,7 @@ exit 0  # Comment out the code above, and delete this to proceed.
 # exec picocom --lower-dtr --lower-rts -b115200 $ESP32TTY
 #
 ## Now go back to steps 5/6: but add --nopk to esp32_install!
+
 
 
 
